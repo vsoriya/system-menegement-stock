@@ -12,6 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Render (and other reverse proxies) terminate TLS; without this,
+        // generated asset URLs stay http:// and the browser blocks them.
+        $middleware->trustProxies(at: '*');
+
         // Runs on web requests so the session-stored locale is applied before
         // any view renders.
         $middleware->web(append: [
