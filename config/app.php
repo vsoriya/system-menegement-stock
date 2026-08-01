@@ -127,6 +127,10 @@ return [
 
     'seed_password' => env('SEED_PASSWORD'),
 
+    // When true AND SEED_PASSWORD is set, UserSeeder updates passwords on
+    // existing seeded accounts. Leave false in normal deploys.
+    'seed_reset_passwords' => (bool) env('SEED_RESET_PASSWORDS', false),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

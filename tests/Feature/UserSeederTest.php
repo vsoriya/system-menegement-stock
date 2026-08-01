@@ -109,6 +109,25 @@ class UserSeederTest extends TestCase
         $this->assertFalse(Hash::check('a-different-password', $admin->password));
     }
 
+    public function test_existing_passwords_can_be_reset_when_explicitly_requested(): void
+    {
+        config(['app.seed_password' => 'first-run-password']);
+
+        $this->seedUsers();
+
+        config([
+            'app.seed_password' => 'new-shared-password',
+            'app.seed_reset_passwords' => true,
+        ]);
+
+        $this->seedUsers();
+
+        $admin = User::query()->where('email', 'admin@example.com')->sole();
+
+        $this->assertTrue(Hash::check('new-shared-password', $admin->password));
+        $this->assertFalse(Hash::check('first-run-password', $admin->password));
+    }
+
     public function test_re_seeding_does_not_create_duplicate_accounts(): void
     {
         config(['app.seed_password' => 'correct-horse-battery']);

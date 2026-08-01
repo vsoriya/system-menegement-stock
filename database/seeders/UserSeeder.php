@@ -22,12 +22,17 @@ class UserSeeder extends Seeder
      *
      * A new account gets a generated password unless one is supplied, so a fresh
      * install is never sitting on a password that is public knowledge.
+     *
+     * Exception: set SEED_PASSWORD and SEED_RESET_PASSWORDS=true to intentionally
+     * reset the seeded accounts (useful when the one-time generated password was
+     * lost from deploy logs).
      */
     public function run(): void
     {
         $supplied = config('app.seed_password');
         $generated = ! is_string($supplied) || mb_strlen($supplied) < 8;
         $password = $generated ? Str::password(16) : $supplied;
+        $resetExisting = (bool) config('app.seed_reset_passwords') && ! $generated;
 
         $users = [
             [
@@ -48,18 +53,25 @@ class UserSeeder extends Seeder
         ];
 
         $created = [];
+        $reset = [];
 
         foreach ($users as $user) {
             /** @var User|null $existing */
             $existing = User::query()->where('email', $user['email'])->first();
 
             if ($existing !== null) {
-                // Name and role are safe to refresh. The password is not.
-                $existing->forceFill([
+                $payload = [
                     'name' => $user['name'],
                     'role' => $user['role'],
                     'is_active' => true,
-                ])->save();
+                ];
+
+                if ($resetExisting) {
+                    $payload['password'] = Hash::make($password);
+                    $reset[] = $user['email'];
+                }
+
+                $existing->forceFill($payload)->save();
 
                 continue;
             }
@@ -76,7 +88,7 @@ class UserSeeder extends Seeder
             $created[] = $user['email'];
         }
 
-        $this->announce($created, $password, $generated);
+        $this->announce($created, $reset, $password, $generated, $resetExisting);
     }
 
     /**
@@ -84,25 +96,38 @@ class UserSeeder extends Seeder
      * recoverable afterwards. Only ever shown for accounts just created.
      *
      * @param  array<int, string>  $created
+     * @param  array<int, string>  $reset
      */
-    protected function announce(array $created, string $password, bool $generated): void
+    protected function announce(array $created, array $reset, string $password, bool $generated, bool $resetExisting): void
     {
         // Null when the seeder is called from a test rather than the console.
         if ($this->command === null) {
             return;
         }
 
-        if ($created === []) {
+        if ($created === [] && $reset === []) {
             $this->command->info('Users already existed. Passwords were left untouched.');
 
             return;
         }
 
-        $this->command->info('Created accounts: '.implode(', ', $created));
+        if ($created !== []) {
+            $this->command->info('Created accounts: '.implode(', ', $created));
+        }
+
+        if ($reset !== []) {
+            $this->command->warn('Reset passwords for: '.implode(', ', $reset));
+        }
 
         if ($generated) {
             $this->command->warn('Generated password (shown once, save it now): '.$password);
             $this->command->warn('Set SEED_PASSWORD in your .env to choose your own instead.');
+
+            return;
+        }
+
+        if ($resetExisting) {
+            $this->command->info('Password taken from SEED_PASSWORD (reset applied).');
 
             return;
         }
