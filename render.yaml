@@ -1,0 +1,52 @@
+# Blueprint: https://dashboard.render.com → New → Blueprint
+# Free web service + Free Postgres (DB expires after 30 days on free).
+
+services:
+  - type: web
+    name: stockpro
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: main
+    healthCheckPath: /login
+    envVars:
+      - key: APP_NAME
+        value: StockPro
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_LOCALE
+        value: km
+      - key: APP_FALLBACK_LOCALE
+        value: en
+      - key: APP_CURRENCY_SYMBOL
+        value: $
+      - key: LOG_LEVEL
+        value: warning
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: IMAGE_DISK
+        value: public
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_URL
+        fromDatabase:
+          name: stockpro-db
+          property: connectionString
+      # Set these in the Render dashboard after first create:
+      # APP_KEY  (php artisan key:generate --show)
+      # APP_URL  (https://stockpro-xxxx.onrender.com)
+
+databases:
+  - name: stockpro-db
+    plan: free
+    databaseName: stockpro
+    user: stockpro
+    region: singapore
