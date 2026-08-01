@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <!-- Pinned so the suite does not change behaviour when the default
+             interface language is changed in .env. The Khmer rendering is
+             covered by a test that sets the locale explicitly. -->
+        <env name="APP_LOCALE" value="en"/>
+        <env name="APP_FALLBACK_LOCALE" value="en"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BROADCAST_CONNECTION" value="null"/>
+        <env name="CACHE_STORE" value="array"/>
+        <!-- MySQL, not in-memory SQLite, and on purpose.
+
+             The two engines do not behave identically. MySQL returns integer
+             columns as strings while SQLite returns real integers, and that one
+             difference hid a bug that made every category filter on the till
+             match nothing: the suite was green while the running shop was
+             broken. Testing on the same engine the shop runs on is worth the
+             extra seconds.
+
+             The database name must end in _test. tests/TestCase.php refuses to
+             run otherwise, because the suite drops every table before it starts
+             and pointing this at the live database would destroy real data.
+
+             Create it once with:
+               mysql -h 127.0.0.1 -u root -p -e "CREATE DATABASE IF NOT EXISTS system_management_stock_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" -->
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_DATABASE" value="system_management_stock_test"/>
+        <env name="DB_URL" value=""/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
+    </php>
+</phpunit>

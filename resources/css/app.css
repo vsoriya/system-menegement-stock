@@ -1,0 +1,272 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/*
+ * Dark mode is driven by a `dark` class on <html> rather than the OS query,
+ * so the user can override their system preference from the UI.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    /*
+     * Instrument Sans has no Khmer glyphs, so Noto Sans Khmer follows it in the
+     * stack. The browser falls through per character, which means Latin text
+     * keeps the primary face while Khmer text renders correctly.
+     */
+    --font-sans: 'Instrument Sans', 'Noto Sans Khmer', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Brand ramp used for primary actions and active navigation. */
+    --color-brand-50: oklch(0.97 0.014 285);
+    --color-brand-100: oklch(0.94 0.03 285);
+    --color-brand-200: oklch(0.89 0.055 285);
+    --color-brand-300: oklch(0.81 0.09 285);
+    --color-brand-400: oklch(0.71 0.14 285);
+    --color-brand-500: oklch(0.62 0.19 285);
+    --color-brand-600: oklch(0.55 0.21 285);
+    --color-brand-700: oklch(0.48 0.2 285);
+    --color-brand-800: oklch(0.4 0.17 285);
+    --color-brand-900: oklch(0.34 0.14 285);
+
+    /*
+     * Semantic surface and text tokens. Views reference these instead of raw
+     * slate shades, so switching theme only means re-pointing the variables
+     * below in the .dark block. No dark: variant needed per utility.
+     */
+    --color-surface: oklch(1 0 0);
+    --color-surface-raised: oklch(1 0 0);
+    --color-surface-sunken: oklch(0.984 0.003 248);
+    --color-ink: oklch(0.208 0.042 266);
+    --color-ink-muted: oklch(0.554 0.046 257);
+    --color-ink-subtle: oklch(0.704 0.04 257);
+    --color-line: oklch(0.929 0.013 256);
+
+    /* Layered shadows, softer and more diffuse than the defaults. */
+    --shadow-soft: 0 1px 2px 0 oklch(0.2 0.03 285 / 0.04), 0 4px 12px -2px oklch(0.2 0.03 285 / 0.06);
+    --shadow-lift: 0 2px 4px -1px oklch(0.2 0.03 285 / 0.06), 0 12px 28px -6px oklch(0.2 0.03 285 / 0.14);
+    --shadow-glow: 0 8px 24px -6px oklch(0.55 0.21 285 / 0.45);
+
+    /* Entrance and feedback animations. */
+    --animate-rise: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-fade: fade 0.4s ease-out both;
+    --animate-pop: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    --animate-slide-left: slide-left 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-toast: toast-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-grow-bar: grow-bar 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-grow-line: grow-line 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+    --animate-shimmer: shimmer 2.2s ease-in-out infinite;
+    --animate-halo: halo 2s ease-out infinite;
+    --animate-float: float 6s ease-in-out infinite;
+
+    @keyframes rise {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fade {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes pop {
+        from {
+            opacity: 0;
+            transform: scale(0.94) translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    @keyframes slide-left {
+        from {
+            opacity: 0;
+            transform: translateX(-14px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes toast-in {
+        from {
+            opacity: 0;
+            transform: translateY(-14px) scale(0.97);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Bar charts grow from the baseline to their final height. */
+    @keyframes grow-bar {
+        from {
+            transform: scaleY(0);
+        }
+        to {
+            transform: scaleY(1);
+        }
+    }
+
+    /* Horizontal meters sweep out to their final width. */
+    @keyframes grow-line {
+        from {
+            transform: scaleX(0);
+        }
+        to {
+            transform: scaleX(1);
+        }
+    }
+
+    @keyframes shimmer {
+        0%,
+        100% {
+            opacity: 0.45;
+        }
+        50% {
+            opacity: 1;
+        }
+    }
+
+    @keyframes halo {
+        0% {
+            box-shadow: 0 0 0 0 currentColor;
+            opacity: 0.55;
+        }
+        70% {
+            box-shadow: 0 0 0 8px currentColor;
+            opacity: 0;
+        }
+        100% {
+            box-shadow: 0 0 0 0 currentColor;
+            opacity: 0;
+        }
+    }
+
+    @keyframes float {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-8px);
+        }
+    }
+}
+
+/*
+ * Dark palette. Re-points the semantic tokens, so every utility built on them
+ * flips at once. Surfaces stay slightly blue to match the brand hue.
+ */
+.dark {
+    --color-surface: oklch(0.235 0.018 266);
+    --color-surface-raised: oklch(0.275 0.02 266);
+    --color-surface-sunken: oklch(0.19 0.016 266);
+    --color-ink: oklch(0.968 0.007 248);
+    --color-ink-muted: oklch(0.72 0.032 257);
+    --color-ink-subtle: oklch(0.58 0.036 257);
+    --color-line: oklch(0.36 0.02 266);
+
+    /* Shadows read as depth only when they are darker than the surface. */
+    --shadow-soft: 0 1px 2px 0 oklch(0 0 0 / 0.3), 0 4px 12px -2px oklch(0 0 0 / 0.35);
+    --shadow-lift: 0 2px 4px -1px oklch(0 0 0 / 0.35), 0 12px 28px -6px oklch(0 0 0 / 0.5);
+    --shadow-glow: 0 8px 24px -6px oklch(0.62 0.19 285 / 0.55);
+
+    color-scheme: dark;
+}
+
+/* Hide Alpine-controlled elements until Alpine has initialised. */
+[x-cloak] {
+    display: none !important;
+}
+
+/*
+ * Khmer script has taller ascenders and stacked subscripts, so it needs more
+ * line height than Latin to stay legible.
+ */
+html:lang(km) body {
+    line-height: 1.75;
+}
+
+/*
+ * Stagger helper. Set --d on an element to delay its entrance animation,
+ * which lets table rows and cards cascade in rather than appear at once.
+ */
+@utility stagger {
+    animation-delay: var(--d, 0ms);
+}
+
+/* Nudge a card up on hover to signal it is interactive. */
+@utility lift {
+    transition:
+        transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.25s ease;
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lift);
+    }
+}
+
+/* Table rows: subtle inset tint plus a slide on hover. */
+@utility row-hover {
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+
+    &:hover {
+        background-color: var(--color-surface-sunken);
+        transform: translateX(2px);
+    }
+}
+
+/* Page background: a soft brand-tinted wash instead of a flat fill. */
+@utility app-canvas {
+    background-color: var(--color-surface-sunken);
+    background-image:
+        radial-gradient(at 0% 0%, oklch(0.62 0.19 285 / 0.09) 0px, transparent 55%),
+        radial-gradient(at 100% 0%, oklch(0.7 0.15 220 / 0.09) 0px, transparent 50%);
+    background-attachment: fixed;
+
+    .dark & {
+        background-image:
+            radial-gradient(at 0% 0%, oklch(0.62 0.19 285 / 0.16) 0px, transparent 55%),
+            radial-gradient(at 100% 0%, oklch(0.7 0.15 220 / 0.12) 0px, transparent 50%);
+    }
+}
+
+/*
+ * Honour the operating system reduced-motion preference. Everything still
+ * renders, it just arrives without movement.
+ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .lift:hover,
+    .row-hover:hover {
+        transform: none;
+    }
+}
