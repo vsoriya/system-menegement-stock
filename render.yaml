@@ -32,14 +32,12 @@ services:
         value: database
       - key: QUEUE_CONNECTION
         value: database
-      # Render's free web service filesystem is ephemeral. With IMAGE_DISK=public,
-      # uploaded product pictures can disappear after a restart or redeploy.
-      # For persistent pictures, set IMAGE_DISK=s3 in the Render dashboard and
-      # add AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION,
-      # AWS_BUCKET, AWS_ENDPOINT, AWS_URL, and AWS_USE_PATH_STYLE_ENDPOINT when
-      # using S3-compatible storage such as Cloudflare R2.
+      # Render's filesystem is ephemeral. Store uploaded product pictures in
+      # S3-compatible object storage such as Cloudflare R2 so they survive
+      # service restarts and redeploys. Add the AWS_* values in the Render
+      # dashboard before deploying.
       - key: IMAGE_DISK
-        value: public
+        value: s3
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_URL
