@@ -146,6 +146,30 @@ set, pictures are stored outside the container and survive deployments.
 If you skip this, everything still works but every product picture disappears
 the next time you deploy.
 
+### Render
+
+Render web services also run with an ephemeral filesystem unless you attach a
+persistent disk. That is why a product picture can show at first, then later
+turn into a broken image after the service restarts, sleeps, or redeploys.
+
+For Render, use object storage for product pictures:
+
+```
+IMAGE_DISK=s3
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_DEFAULT_REGION=auto
+AWS_BUCKET=...
+AWS_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+AWS_URL=https://<public-bucket-domain-or-cdn-domain>
+AWS_USE_PATH_STYLE_ENDPOINT=true
+AWS_VISIBILITY=public
+```
+
+Cloudflare R2 works well here because it speaks the S3 protocol. Make the bucket
+public through a custom/public domain and put that domain in `AWS_URL`, otherwise
+the browser has no public URL to load the image from.
+
 ---
 
 ## 5. First deployment
