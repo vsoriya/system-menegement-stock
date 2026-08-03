@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Render (and other reverse proxies) terminate TLS; without this,
         // generated asset URLs stay http:// and the browser blocks them.
         $middleware->trustProxies(at: '*');
+        $middleware->append(\App\Http\Middleware\SecureHeaders::class);
+
 
         // Runs on web requests so the session-stored locale is applied before
         // any view renders.
